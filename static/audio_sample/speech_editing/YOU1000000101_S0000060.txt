@@ -1,0 +1,2 @@
+ORIG: they knew that governments don't control things. a government can't control the economy without controlling people.
+NEW: they knew that governments don't control money directly. a government can't control the economy without controlling people.

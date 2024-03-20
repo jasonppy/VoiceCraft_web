@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="VoiceCraft: Zero-Shot Speech Editing and Text-to-Speech in the Wild">
+  <meta name="keywords" content="Speech Editing, Zero-shot TTS, Neural Codec Language Models">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VoiceCraft</title>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L7749G0HJZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-L7749G0HJZ');
+</script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body" style="padding-bottom: 24px;">
+    <div class="container  is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">VoiceCraft: Zero-Shot Speech Editing and Text-to-Speech in the Wild</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://jasonppy.github.io/">Puyuan Peng</a><sup>1</sup>,</span>
+            <span class="author-block">
+              Po-Yao Huang,
+            <span class="author-block">
+              Daniel Li,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?hl=en&user=tJ_PrzgAAAAJ">Abdelrahman Mohamed</a><sup>2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://www.cs.utexas.edu/~harwath/">David Harwath</a><sup>1</sup>,
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>The University of Texas at Austin</span>
+            <span class="author-block"><sup>2</sup>Rembrand</span>
+          </div>
+
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/1706.03762"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>Paper (Coming soon)</span>
+                </a>
+                <a href="https://arxiv.org/abs/1706.03762" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code&Model (Coming soon)</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<section id="abs" class="section" style="padding-top: 0px;">
+  <div class="container  is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">TL;DR</h2>
+        <div class="content has-text-justified">
+          <p>
+                <b>VoiceCraft</b> is a token infilling neural codec language model, that achieves <b>state-of-the-art</b> performance on both <b>speech editing</b> and <b>zero-shot text-to-speech (TTS)</b> on in-the-wild data including <b>audiobooks, internet videos, and podcasts.</b>
+          </p>
+          <p>
+              To clone an unseen voice or edit a recording, VoiceCraft needs only a few seconds of the voice.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop is-centered has-text-centered">
+    <div class="hero-body">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Speech Editing with VoiceCraft</h2>
+          <img src="./static/images/teaser.png" class="interpolation-image"
+            alt="Interpolate start reference image." />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="toc" class="section" style="padding-top: 0px;">
+  <div class="container  is-fluid">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Table of Contents</h2>
+        <div class="is-centered">
+          <ul>
+            <li><a href="#wild"><b>Teaser</b>: Guess which part is synthesized!</a></li>
+            <li><a href="#vc_fs"><b>Speech Editing</b>: VoiceCraft vs FluentSpeech</a></li>
+            <li><a href="#vc_vb"><b>Speech Editing</b>: VoiceCraft vs Voicebox</a></li>
+            <li><a href="#tts"><b>Zero-shot TTS</b>: VoiceCraft vs prior SotA</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="wild" class="hero is-light">
+  <div class="hero-body">
+    <div class="container is-fluid">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Guess which part is synthesized!</h2>
+          <div class="content">
+              <button id="toggleButton" class="button is-info">Show/Hide Original Content</button>
+          </div>
+        </div>
+      </div>
+      <div class="columns is-centered has-text-centered">
+        <table class="table" style="background-color: transparent;">
+          <thead>
+            <tr>
+              <th align="center" class="original-content is-hidden"><strong>
+                  Original Transcript</strong></th>
+              <th align="center" class="original-content is-hidden"><strong>Original Audio</strong></th>
+              <th align="center"><strong></span>
+                  Edited Transcript</strong></th>
+              <th align="center"><strong><span class="icon"><i class="fas fa-magic"></i></span>VoiceCraft Edited Audio</strong></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td width="28%" style="text-align: left;" class="original-content is-hidden">what do I really wanna do, I wanna talk to the audience <p>(Oprah Winfrey, <a href="https://www.youtube.com/watch?v=G_kMOVS1qY8&t=120s">source</a>)</p></td>
+              <td width="12%" style="text-align: center;" class="original-content is-hidden"><audio controls="">
+                  <source src="static/audio_sample/teaser/oprah.wav" type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">what do I really wanna do, I wanna talk to the audience, which is always the best part of my day</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/teaser/concat_oprah.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;" class="original-content is-hidden">Cause a year from now, when you kickin' it in the Caribbean, you gonna say to yourself, "Marcellus Wallace was right"<p>(Irving Rameses Rhames in Pulp Fiction, <a href="https://youtu.be/c1q2PitIM9w?t=148s">source</a>)</p></td>
+              <td width="12%" style="text-align: center;" class="original-content is-hidden"><audio controls="">
+                  <source src="static/audio_sample/teaser/caribbean.wav" type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">Cause a year from now, when you kickin' it in the Caribbean as an independent researcher, you gonna say to yourself, "my advisor was right"</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source
+                    src="static/audio_sample/teaser/concat_caribbean.wav"
+                    type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;" class="original-content is-hidden">The path of the righteous man is beset on all sides by the inequities of the
+                selfish and the tyranny of evil men.<p>(Samuel Jackson in Pulp Fiction, <a href="https://youtu.be/pRE23YfSvc8?t=126s">source</a>)</p></td>
+              <td width="12%" style="text-align: center;" class="original-content is-hidden"><audio controls="">
+                  <source src="static/audio_sample/teaser/bible.wav" type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">The path of the righteous man is beset on all sides by the inequities of the selfish and the tyranny of evil men. Yet,
+              he walks with unwavering resolve, guided by a compass of moral clarity and a heart unyielding in the face of adversity.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/teaser/concat_bible.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;" class="original-content is-hidden">I saw it, I saw it, and it was amazing. Who said that I didn't see it? Did Jim say that I didn't see it? I saw it!<p>(Jenna Fischer in The Office, <a
+                    href="https://www.youtube.com/shorts/XqLZAAMjDUY?t=23&feature=share">source</a>)</p>
+              </td>
+              <td width="12%" style="text-align: center;" class="original-content is-hidden"><audio controls="">
+                  <source src="static/audio_sample/teaser/pam.wav" type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">I saw it, I saw it, and it was beautiful. Who said that I didn't see it? Did Jim say that I didn't see it? He just
+              envies me, I saw it!</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/teaser/concat_pam.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;" class="original-content is-hidden">I don't like to write down things that I don't mean <p>(Miley Cyrus, <a href="https://youtu.be/D7WUMXKV-FE?t=1060s">source</a>)</p></td>
+              <td width="12%" style="text-align: center;" class="original-content is-hidden"><audio controls="">
+                  <source src="static/audio_sample/teaser/miley.wav" type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">I don't like to write down things that I don't mean, and when I was writing wrecking ball I really poured my heart into
+              it</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/teaser/concat_miley.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+        <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <a href="#toc" class="button is-primary">Go Back to Table of Contents</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // JavaScript to toggle the visibility
+  document.getElementById('toggleButton').addEventListener('click', function () {
+    var elements = document.querySelectorAll('.original-content');
+    for (var i = 0; i < elements.length; i++) {
+      elements[i].classList.toggle('is-hidden'); // Toggle a class that hides/shows the element
+    }
+  });
+</script>
+
+
+<section id="vc_fs" class="hero">
+  <div class="hero-body">
+    <div class="container is-fluid">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Speech Editing: VoiceCraft v.s. FluentSpeech</h2>
+          <div class="content">
+            <p>All speakers are unseen during training. Utterances are from our RealEdit evaluation set, comprises audiobooks, YouTube videos, and Spotify podcasts</p>
+          </div>
+        </div>
+      </div>
+      <div class="columns is-centered has-text-centered">
+        <table class="table" style="background-color: transparent;">
+          <thead>
+            <tr>
+              <th align="center"><strong></span>Original Transcript</strong></th>
+              <th align="center"><strong>Original Recording</strong></th>
+              <th align="center"><strong>Target Transcript:</strong></th>
+              <th align="center"><strong><span class="icon"><i class="fas fa-magic"></i></span>VoiceCraft (Ours)</strong></th>
+              <th align="center"><strong>FluentSpeech</strong></th>
+            </tr>
+          </thead>
+          <tbody>
+      <tr>
+        <td width="28%" style="text-align: left;">Fast cars, that had the nice clothes, that had the money, they was
+          criminals.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_1cOsDxbQjLADedwZaG7Bm1-6mLz726LYCcgN69RWWlrOJ.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">Fast cars, that had the nice clothes, <b>that had expensive gold watches,</b> that
+          had the money, they was criminals.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_1cOsDxbQjLADedwZaG7Bm1-6mLz726LYCcgN69RWWlrOJ_ve.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_1cOsDxbQjLADedwZaG7Bm1-6mLz726LYCcgN69RWWlrOJ_fs.wav"
+              type="audio/wav">
+          </audio></td>
+      </tr>
+      <tr>
+        <td width="28%" style="text-align: left;">We would just be open and willing to adopt whatever child God brought to her
+          life.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2cSm7FgVuDH3IbmSlWkZzH-0hFwD7TSXO5c69BPwJzOfx.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">We would just be <b>excited to welcome</b> whatever child God brought into
+          her life.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2cSm7FgVuDH3IbmSlWkZzH-0hFwD7TSXO5c69BPwJzOfx_ve.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2cSm7FgVuDH3IbmSlWkZzH-0hFwD7TSXO5c69BPwJzOfx_fs.wav"
+              type="audio/wav">
+          </audio></td>
+      </tr>
+      <tr>
+        <td width="28%" style="text-align: left;">that's a bomb and that's a good sign from him. he got fully extended on it.
+          knew it as soon as that ball left.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000113_S0000034.wav" type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">that's a bomb and that's a good sign from him. <b>he clearly signalled and made
+          the play happen</b> as soon as that ball left.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000113_S0000034_ve.wav" type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000113_S0000034_fs.wav" type="audio/wav">
+          </audio></td>
+      </tr>
+
+    <tr>
+      <td width="28%" style="text-align: left;">economic development remains one of the most effective ways to increase the
+        capacity to adapt to climate change.</td>
+      <td width="12%" style="text-align: center;"><audio controls="">
+          <source src="static/audio_sample/speech_editing/YOU1000000127_S0000064.wav" type="audio/wav">
+        </audio></td>
+      <td width="28%" style="text-align: left;">economic development remains one of the most <b>promising options that we have
+        left on the table</b> to increase the capacity to adapt to climate change.</td>
+      <td width="12%" style="text-align: center;"><audio controls="">
+          <source src="static/audio_sample/speech_editing/YOU1000000127_S0000064_ve.wav" type="audio/wav">
+        </audio></td>
+      <td width="12%" style="text-align: center;"><audio controls="">
+          <source src="static/audio_sample/speech_editing/YOU1000000127_S0000064_fs.wav" type="audio/wav">
+        </audio></td>
+    </tr>
+
+
+      <tr>
+        <td width="28%" style="text-align: left;">So if you've been following my story, you will remember that I said earlier
+          in this podcast that the Grammy nominations came out.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2ctsjdVxkuzqftlC9TJASy-6iadzuoEBJ9AOLXaXPmagP.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">So if you've been following my story, you will remember that I said earlier
+          <b>that this week we had super exciting stuff to talk about because</b> Grammy nominations came out.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2ctsjdVxkuzqftlC9TJASy-6iadzuoEBJ9AOLXaXPmagP_ve.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2ctsjdVxkuzqftlC9TJASy-6iadzuoEBJ9AOLXaXPmagP_fs.wav"
+              type="audio/wav">
+          </audio></td>
+      </tr>
+      <tr>
+        <td width="28%" style="text-align: left;">because we can include so many other characters if we just expand the
+          definitions to any sword wielder, who's a little spicy.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000023_S0000047.wav" type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">because we can include so many other <b>participants if we are brave enough</b> to
+          expand the definitions to any <b>blade</b> wielder, who's a little spicy.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000023_S0000047_ve.wav" type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000023_S0000047_fs.wav" type="audio/wav">
+          </audio></td>
+      </tr>
+      <tr>
+        <td width="28%" style="text-align: left;">It was a glance of inquiry, ending in a look of chagrin, with some muttered
+          phrases that rendered it more emphatic.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/4153_61735_000020_000001.wav" type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">It was a <b>look of disgust followed by a curled lip,</b> with some muttered
+          phrases that rendered it more emphatic.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/4153_61735_000020_000001_ve.wav" type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/4153_61735_000020_000001_fs.wav" type="audio/wav">
+          </audio></td>
+      </tr>
+
+            <tr>
+              <td width="28%" style="text-align: left;">some times i really feel that the world around us continues to be more
+                hectic and more complicated and so many of us are truly craving to find simplicity.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/speech_editing/YOU1000000153_S0000000.wav" type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">some times i really feel that the world around us continues to be more
+                <b>hectic, more impersonal, and more uncaring</b> and so many of us are truly craving to find simplicity.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/speech_editing/YOU1000000153_S0000000_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/speech_editing/YOU1000000153_S0000000_fs.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+
+      <tr>
+        <td width="28%" style="text-align: left;">For making the title though because I need to get my numbers way up before I
+          get there, but I'm gonna get there title of Iceland is definitely going to sign me and um, yeah.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2cGQMNoS6MuKFozuNYjCOQ-6qmAgAKLoYpSknCgQ0y6ET.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">For making the title though because I need to get my numbers way up before I
+          get there, but I'm gonna get there title of Iceland <b>is going</b> to sign me and um, yeah.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2cGQMNoS6MuKFozuNYjCOQ-6qmAgAKLoYpSknCgQ0y6ET_ve.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2cGQMNoS6MuKFozuNYjCOQ-6qmAgAKLoYpSknCgQ0y6ET_fs.wav"
+              type="audio/wav">
+          </audio></td>
+      </tr>
+      <tr>
+        <td width="28%" style="text-align: left;">they knew that governments don't control things. a government can't control
+          the economy without controlling people.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000101_S0000060.wav" type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">they knew that governments don't control <b>money directly</b>. a government can't
+          control the economy without controlling people.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000101_S0000060_ve.wav" type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000101_S0000060_fs.wav" type="audio/wav">
+          </audio></td>
+      </tr>
+
+ 
+      <tr>
+        <td width="28%" style="text-align: left;">No words just lightning breaking darkness and crashing into the Earth with
+          brilliant presence.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2t5PIVQePC6L3CFRpAUnaf-0f0tl83ucovdSpJHoftEU5.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">No words just lightning breaking darkness and crashing into <b>the surface of</b>
+          the Earth with brilliant presence.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2t5PIVQePC6L3CFRpAUnaf-0f0tl83ucovdSpJHoftEU5_ve.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2t5PIVQePC6L3CFRpAUnaf-0f0tl83ucovdSpJHoftEU5_fs.wav"
+              type="audio/wav">
+          </audio></td>
+      </tr>
+
+      <tr>
+        <td width="28%" style="text-align: left;">that schedule is one per week and it will probably be like a Wednesday night
+          thing because I plan on doing one to two videos per week.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2cDEjUoE1xIZqEMHdy2iLg-3BhVKbLFPasrUOxLgZNUbd.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">that schedule is one per week and <b>you will start to see a lot more content
+          arriving</b> because I plan on doing one to two videos per week.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2cDEjUoE1xIZqEMHdy2iLg-3BhVKbLFPasrUOxLgZNUbd_ve.wav"
+              type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/show_2cDEjUoE1xIZqEMHdy2iLg-3BhVKbLFPasrUOxLgZNUbd_fs.wav"
+              type="audio/wav">
+          </audio></td>
+      </tr>
+      <tr>
+        <td width="28%" style="text-align: left;">in a case like this, i probably wouldn't spend any more time looking at the
+          deal if i was only interested in the cash flow.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000155_S0000027.wav" type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">in a case like this, i probably wouldn't spend any more time looking at <b>all
+          the details and the fine print</b> if i was only interested in the cash flow.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000155_S0000027_ve.wav" type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000155_S0000027_fs.wav" type="audio/wav">
+          </audio></td>
+      </tr>
+      <tr>
+        <td width="28%" style="text-align: left;">but the renaissance broke their monopoly on knowledge, one of the most
+          important bastions of the church.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000137_S0000397.wav" type="audio/wav">
+          </audio></td>
+        <td width="28%" style="text-align: left;">but the renaissance broke their monopoly on knowledge, <b>with it's free
+          movement of research and endless scientific inquiry,</b> one of the most important bastions of the church.</td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000137_S0000397_ve.wav" type="audio/wav">
+          </audio></td>
+        <td width="12%" style="text-align: center;"><audio controls="">
+            <source src="static/audio_sample/speech_editing/YOU1000000137_S0000397_fs.wav" type="audio/wav">
+          </audio></td>
+      </tr>
+            </tbody>
+        </table>
+      </div>
+              <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                  <a href="#toc" class="button is-primary">Go Back to Table of Contents</a>
+                </div>
+              </div>
+    </div>
+  </div>
+</section>
+
+<section id="vc_vb" class="hero is-light ">
+  <div class="hero-body">
+    <div class="container is-fluid">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Speech Editing: VoiceCraft v.s. Voicebox</h2>
+          <div class="content">
+            <p>The original recordings and Voicebox's output are taken from the official demo page of Voicebox <a href="https://voicebox.metademolab.com/edit.html">at here.</a></p> 
+          </div>
+        </div>
+      </div>
+      <div class="columns is-centered has-text-centered">
+        <table class="table" style="background-color: transparent;">
+          <thead>
+            <tr>
+              <th align="center"><strong></span>Original
+                  Transcript</strong></th>
+              <th align="center"><strong>Original Recording</strong></th>
+              <th align="center"><strong>Target
+                  Transcript:</strong></th>
+              <th align="center"><strong><span class="icon"><i class="fas fa-magic"></i></span>VoiceCraft (Ours)</strong></th>
+              <th align="center"><strong>Voicebox</strong></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td width="28%" style="text-align: left;">will find himself completely at a loss on occasions of common and constant recurrence speculative ability is one thing
+              and practical ability is another</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source
+                    src="static/audio_sample/VoiceCraft_Voicebox/orig/3.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">will find himself completely at a loss on <b>rare and unpredictable circumstances</b> speculative ability is one thing and
+              practical ability is another</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source
+                    src="static/audio_sample/VoiceCraft_Voicebox/voicecraft/3_0.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source
+                    src="static/audio_sample/VoiceCraft_Voicebox/voicebox/3_0.wav"
+                    type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">in zero weather in mid-winter when the earth is frozen to a great depth below the surface when in driving over the
+              unpaved country roads they give forth a hard metallic ring</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/orig/0.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">in zero weather in mid-winter when <b>jack frost has cast his icy spell upon the land</b> when in driving over the unpaved
+              country roads they give forth a hard metallic ring</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicecraft/0_0.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicebox/0_0.wav"
+                    type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">and especially as i am not very much up in latin myself he said the suit was on an insurance policy that he was
+              defending on the ground of misinterpretations</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/orig/1.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">and especially as i am not very much up in latin myself he said the suit was on <b>a classified treasure map</b> that he was
+              defending on the ground of misinterpretations</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicecraft/1_0.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicebox/1_0.wav"
+                    type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">yet these petty operations incessantly continued in time surmount the greatest difficulties mountains are elevated and
+              oceans bounded by the slender force of human beings</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/orig/2.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">yet these petty operations incessantly continued in time surmount the greatest difficulties <b>vast challenges emerge and
+              unexplored frontiers beckon</b> by the slender force of human beings</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicecraft/2_0.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicebox/2_0.wav"
+                    type="audio/wav">
+                </audio></td>
+            </tr>
+
+            <tr>
+              <td width="28%" style="text-align: left;">and the carlsruhe professor had to devise an ingenious apparatus which enabled him to bring the preparation at the
+              required temperature on to the very plate of the microscope</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/orig/4.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">and the <b>inventive</b> professor had to devise an ingenious apparatus which enabled him to bring the preparation at the
+              required temperature on to the very plate of the microscope</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicecraft/4_0.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicebox/4_0.wav"
+                    type="audio/wav">
+                </audio></td>
+            </tr>
+
+            <tr>
+              <td width="28%" style="text-align: left;">this was george steers the son of a british naval captain and ship modeler who had become an american naval officer and
+              was the first man to take charge of the washington navy yard</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/orig/5.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="28%" style="text-align: left;">this was george steers the son of a british naval captain and ship modeler who had become an american naval officer and
+              was <b>entrusted with the prestigious role of overseeing the operations at the renowned naval headquarters</b></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicecraft/5_0.wav"
+                    type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/VoiceCraft_Voicebox/voicebox/5_0.wav"
+                    type="audio/wav">
+                </audio></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+              <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                  <a href="#toc" class="button is-primary">Go Back to Table of Contents</a>
+                </div>
+              </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="tts" class="hero ">
+  <div class="hero-body">
+    <div class="container is-fluid">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Zero-Shot TTS: VoiceCraft v.s. Prior SotA</h2>
+          <div class="content">
+            <p>All speakers are unseen during training. Only the first 3 seconds of the Voice Prompt are given to the models</p>
+          </div>
+        </div>
+      </div>
+      <div class="columns is-centered has-text-centered">
+        <table class="table" style="background-color: transparent;">
+          <thead>
+            <tr>
+              <th align="center"><strong></span>Traget Transcript</strong></th>
+              <th align="center"><strong>Voice Prompt (only the first 3 seconds is used)</strong></th>
+              <th align="center"><strong><span class="icon"><i class="fas fa-magic"></i></span>VoiceCraft (Ours)</strong></th>
+              <th align="center"><strong>VALLE</strong></th>
+              <th align="center"><strong>XTTS v2</strong></th>
+              <th align="center"><strong>FluentSpeech</strong></th>
+              <th align="center"><strong>YourTTS</strong></th>
+              <th align="center"><strong>Ground Truth</strong></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td width="28%" style="text-align: left;">i don't wanna make it as a thing where i'm absolving myself of any
+                responsibility.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000108_S0000041_prompt.wav" type="audio/wav">
+                </audio></td>
+                <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000108_S0000041_ve.wav" type="audio/wav">
+                </audio></td>
+                <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000108_S0000041_valle.wav" type="audio/wav">
+                </audio></td>
+                <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000108_S0000041_xtts.wav" type="audio/wav">
+                </audio></td>
+                <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000108_S0000041_fs.wav" type="audio/wav">
+                </audio></td>
+                <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000108_S0000041_yourtts.wav" type="audio/wav">
+                </audio></td>
+                <td width="12%" style="text-align: center;"><audio controls="">
+                    <source src="static/audio_sample/tts/YOU1000000108_S0000041_orig.wav" type="audio/wav">
+                  </audio></td>
+              </tr>
+            
+            <tr>
+              <td width="28%" style="text-align: left;">and the only way to do great work is to love what you do. if you haven't found it yet, keep looking.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000102_S0000180_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000102_S0000180_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000102_S0000180_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000102_S0000180_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000102_S0000180_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000102_S0000180_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000102_S0000180_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">i'm pleading the fifth about my shoeless state at the moment. but what if
+                you learned about yourselves in this time and and what has changed about the way that you're working?</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000185_S0000130_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000185_S0000130_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000185_S0000130_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000185_S0000130_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000185_S0000130_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000185_S0000130_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000185_S0000130_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">we voted it out that was a standard that people used till eleven or little
+                bit past eleven um and it was an international standard.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000171_S0000062_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000171_S0000062_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000171_S0000062_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000171_S0000062_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000171_S0000062_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000171_S0000062_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000171_S0000062_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">hey you all, my name is corey ash and, and i know that you have been working
+                really hard to try to figure out</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000005_S0000000_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000005_S0000000_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000005_S0000000_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000005_S0000000_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000005_S0000000_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000005_S0000000_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000005_S0000000_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">Do you know I was so foolish that I thought every flash of lightning must
+                descend on your head.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1630_73710_000014_000008_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1630_73710_000014_000008_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1630_73710_000014_000008_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1630_73710_000014_000008_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1630_73710_000014_000008_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1630_73710_000014_000008_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1630_73710_000014_000008_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">Quox did not have much to say until the conversation was ended, but then he
+                turned to Kaliko and asked:</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1272_135031_000026_000002_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1272_135031_000026_000002_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1272_135031_000026_000002_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1272_135031_000026_000002_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1272_135031_000026_000002_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1272_135031_000026_000002_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1272_135031_000026_000002_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">you know it's one thing to kind of be home alone but it's another to know
+                that you have, you know zoom, yoga classes with friend of yours.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000117_S0000096_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000117_S0000096_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000117_S0000096_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000117_S0000096_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000117_S0000096_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000117_S0000096_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000117_S0000096_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">at its base, raider one is a four wheel drive polaris, MVRS 700, that controllers can operate nearly one thousand yards away.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000173_S0000177_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000173_S0000177_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000173_S0000177_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000173_S0000177_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000173_S0000177_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000173_S0000177_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000173_S0000177_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+
+            <tr>
+              <td width="28%" style="text-align: left;">We clambered up to the front seat and jolted off past the little pond and
+                along the road that climbed to the big cornfield.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1988_147956_000001_000003_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1988_147956_000001_000003_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1988_147956_000001_000003_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1988_147956_000001_000003_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1988_147956_000001_000003_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1988_147956_000001_000003_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/1988_147956_000001_000003_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            
+            <tr>
+              <td width="28%" style="text-align: left;">We were the only ones who did go afoot, however, although the corrals were not more than two hundred yards' distant.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/6841_88291_000006_000000_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/6841_88291_000006_000000_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/6841_88291_000006_000000_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/6841_88291_000006_000000_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/6841_88291_000006_000000_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/6841_88291_000006_000000_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/6841_88291_000006_000000_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            <tr>
+              <td width="28%" style="text-align: left;">blank space because i'd written a lot of lines down already in the year
+                preceding the session.</td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000106_S0000024_prompt.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000106_S0000024_ve.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000106_S0000024_valle.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000106_S0000024_xtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000106_S0000024_fs.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000106_S0000024_yourtts.wav" type="audio/wav">
+                </audio></td>
+              <td width="12%" style="text-align: center;"><audio controls="">
+                  <source src="static/audio_sample/tts/YOU1000000106_S0000024_orig.wav" type="audio/wav">
+                </audio></td>
+            </tr>
+            </tbody>
+            </table>
+            </div>
+                    <div class="columns is-centered has-text-centered">
+                      <div class="column is-four-fifths">
+                        <a href="#toc" class="button is-primary">Go Back to Table of Contents</a>
+                      </div>
+                    </div>
+            </div>
+            </div>
+            </section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{peng2024voicecraft,
+  author    = {Peng, Puyuan and Huang, Po-Yao and Li, Daniel and Mohamed, Abdelrahman and Harwath, David},
+  title     = {VoiceCraft: Zero-Shot Speech Editing and Text-to-Speech in the Wild},
+  journal   = {arXiv},
+  year      = {2024},
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container is-fluid">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Licenses</h2>
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="https://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
+            Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            Website source code based on the <a
+            href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project page.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

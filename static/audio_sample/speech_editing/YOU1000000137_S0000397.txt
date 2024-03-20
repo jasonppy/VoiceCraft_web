@@ -1,0 +1,2 @@
+ORIG: but the renaissance broke their monopoly on knowledge, one of the most important bastions of the church.
+NEW: but the renaissance broke their monopoly on knowledge, with it's free movement of research and endless scientific inquiry, one of the most important bastions of the church.

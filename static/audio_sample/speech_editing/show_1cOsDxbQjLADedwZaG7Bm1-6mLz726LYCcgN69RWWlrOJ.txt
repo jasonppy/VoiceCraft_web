@@ -1,0 +1,2 @@
+ORIG: Fast cars, that had the nice clothes, that had the money, they was criminals.
+NEW: Fast cars, that had the nice clothes, that had expensive gold watches, that had the money, they was criminals.
